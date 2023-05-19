@@ -1,0 +1,12 @@
+.clustering-header ul {
+	list-style: none;
+	justify-content: space-between;
+}
+
+.clustering-header li {
+	display: inline-block;
+	box-sizing: border-box;
+	text-align: center;
+	padding: 10px;
+	margin: 0;
+}

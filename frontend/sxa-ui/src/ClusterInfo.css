@@ -1,0 +1,7 @@
+.whole-info table {
+	margin: 0 auto;
+	border-collapse: collapse;
+}
+.whole-info table,tr,td,th {
+	border: solid 1px black;
+}

@@ -1,0 +1,286 @@
+# todo
+- djangoをnginx/gunicornで実行するようにする？
+- clustringサービスの実装
+- サービスIF定義
+- UIの作成
+
+# 使用技術
+- server: nginx/gunicorn
+- app: django
+- front: chart.js
+
+# step
+- 使用技術の決定 済
+- 環境構築
+- サービスの完成
+- 2022/8/26 中間レビュー
+- UIの完成
+- 2022/8/31 最終レビュー
+
+django
+Cython	//scikit_learn0.22をインストールするために必要
+scikit_learn==0.22 //clustering_model.pklを使用するために必要
+pickle5
+
+python -m venv .venv
+source .venv/bin/activate
+pip install django scikit-learn pickle5
+pip freeze > requirement.txt
+//pip install -r requirement.txt
+django-admin startproject project-name
+python manage.py runserver
+python manage.py startapp app-name
+
+djangoプロジェクトの作成
+manage.py runserverの実行
+実行した開発用サーバーへのアクセス
+manage startappでアプリの作成、クラスタリング
+
+
+# javascriptで行うこと
+- ドラッグアンドドロップの受付
+- アップロードされたファイルをサーバーへ送る
+- djangoアプリのクラスタリングAPIを呼んでクラスタリング実行
+- 実行結果のjsonデータを受け取る
+- 受け取ったjsonデータを画面表示用に成形
+- htmlに埋め込んで表示する
+
+# django側で行うこと
+- request受け取り、ルーティング
+- クラスタリングモジュール呼び出し
+- csvを読み込んでクラスタリング実行、集計して結果をjson形式でレスポンス返す。
+
+- 調査
+- djangoプロジェクトの作成
+- djangoアプリの作成
+- csvファイルの読み込み
+- データクレンジング
+- モデル適用
+- 集計
+- レスポンス用jsonデータ作成
+
+
+{
+	クラスタNo: ,
+	クラスタ人数: ,
+	全体に対する人数の割合: ,
+	商品1の合計金額: ,
+	商品1の合計金額の全体に対する割合: ,
+	商品2の合計金額: ,
+	商品2の合計金額の全体に対する割合: ,
+	数値カラムリスト:[
+		{
+			数値カラム名前: ,
+			数値カラム平均値: ,
+			数値カラム平均値の全体に対する割合: ,
+		},
+	],
+	文字列カラムリスト:[
+		{
+			文字列カラム名前: ,
+			項目リスト: [
+				{
+					文字列カラム項目名: ,
+					その項目の数: ,
+					その項目の数の全体に対する割合: ,
+				},
+			],
+		},
+	]
+}
+
+理想のdataframe構造
+jsonにしたい項目が列になっている。
+クラスタごとに行がある。
+クラスタNo 人数 人数シェア ....
+1		  100  20
+2		  200  30
+3
+...
+
+# 欲しいデータ
+- 全体件数	total_count:
+- 全体sales1_sum	total_sales1_amount:
+- 全体sales2_sum	total_sales2_amount:
+
+- 数値カラムリスト	num_cols:
+	- 数値カラム名: 数値カラム別mean	num_col: 	
+
+- 文字列カラムリスト str_cols:
+	- 文字列カラム名: str_col_name: 
+		- 項目名: 全体文字列カラム別項目別count category_name:
+
+- クラスタグループリスト clusters:
+	- クラスタNo: 			cluster_no:
+		- クラスタ別件数		count:
+		- クラスタ別sales1_sum	sales1_amount:
+		- クラスタ別sales2_sum	sales2_amount:
+		- 数値カラムリスト		num_cols:
+			- 数値カラム名: クラスタ別数値カラム別mean	num_col_name:
+		- 文字列カラムリスト str_cols
+			- 文字列カラム名: str_col_name:
+					- 項目名: クラスタ別文字列カラム別項目count category_name: 
+数値列も「平均という名前のカテゴリに、クラスタ別平均値と全体平均値の差分」を持たせれば文字列カラムと同じ構造になる？
+そうすれば数値カラムリスト、文字列カラムリストと分けなくて済む？
+[
+	 {
+		- cluster_No
+		- count
+		- count_share
+		- sales1_amount
+		- sales1_share
+		- sales2_amount
+		- sales2_share
+		- columns: [
+			{
+				- column_name
+				- categories: {
+					- category_name
+					- value
+					- difference
+				}
+			}
+		]
+	}
+]
+
+ネストを浅くするためにカラム名、集計値、差分をそれぞれ別のリストにする？順番通りになっていることを想定する？
+[
+	 {
+		- cluster_No
+		- count
+		- count_share
+		- sales1_amount
+		- sales1_share
+		- sales2_amount
+		- sales2_share
+		- column_names: []
+		- values:[]
+		- diffs: []
+	}
+]
+
+なんならクラスタもリスト分ける？
+{
+	- cluster_No_list: []
+	- count_list: []
+	- count_share_list: []
+	- sales1_amount_list: []
+	- sales1_share_list: []
+	- sales2_amount_list: []
+	- sales2_share_list: []
+	- column_name_list_list: [[]]
+	- value_list_list:[[]]
+	- diff_list_list: [[]]
+}
+
+
+
+- 数値列リスト:[
+	{
+		- カラム名
+		- クラスタ別平均値
+		- クラスタ別平均値の全体平均値に対する差分
+	}
+]
+- 文字列列リスト: [
+	{
+		- カラム名
+		- カテゴリリスト: [
+			{
+				- カテゴリ名
+				- クラスタ内でのこのカテゴリの割合
+				- クラスタ内でのこのカテゴリの割合の全体のこのカテゴリの割合との差分
+			}
+		]
+	}
+]
+
+
+conv_dic = {
+	'str_col_name': {
+		category_name_before: after
+	}
+}
+conv_dic['str_col_name'][category_name_before]
+
+for col_name, category in conv_dic.items():
+	for before, after in category.items():
+		json_data['str_cols'][col_name][before] = json_data['str_cols'][col_name].pop(after)
+
+for cluster_no in json_data['clusters'].keys():
+	for col_name, category in conv_dic.items():
+		for before, after in category.items():
+			json_data['clusters'][cluster_no]['str_cols'][col_name][before] = json_data['clusters'][cluster_no]['str_cols'][col_name].pop(after)
+
+json_data['str_cols']['col_name']['category_name_after']
+json_data['clusters']['cluster_no']['str_cols']['col_name']['category_name_after']
+
+
+gunicorn起動
+djangoのプロジェクトルートディレクトリで実行(manage.pyがある場所)
+gunicorn --bind localhost:8000 sxa.wsgi gunicorn
+
+reactとdjangoの連携
+django-api-frameworkでdjangoをapiサーバーとして活用する。
+axios: フロントのreactからバックのdjangoにリクエストを送る。
+next.js
+
+react setup:
+	//sudo apt install nodejs
+	sudo apt install npm
+	aptのnodejsじゃなくてnpmからnをインストールしてnからnodeをインストールする
+	sudo npm install -g n
+	//n stableで推奨版のnodeをインストール
+	sudo n stable
+	//sudo n latestで最新版
+	//nでインストールされているnodeを確認
+	sudo npm install -g create-react-app
+	create-react-app app-name
+	cd app-name
+	npm start
+	//localhost:3000でサーバーが起動する。
+	//その他必要なものがあればインストールする
+	npm install react-router-dom
+
+	npm startはindex.jsが起点。
+	デフォルトではindexでApp呼んで、App.jsに処理を書いていく。
+	react-router-dom使ってるときはAppのreturnにはRoutesでルーティングを書く。
+
+docker getting-started:
+	//↓だけでとりあえずubuntuのコンテナ作ってshellに入れる。
+	docker run -it ubuntu /bin/bash
+	//作成済みのコンテナに入る場合は
+	//コンテナIDを取得、
+	docker ps -a
+	//IDを指定してexec -itで入る。
+	docker exec -it container-id /bin/bash
+
+
+django:
+	clustering/exec method='post'でクラスタリング実行
+	リクエストのヘッダーは'Content-Type': 'text/csv'
+	UIでドラッグアンドドロップされたCSVファイルの内容をそのままHTTPリクエストとして渡す。
+	django側はリクエストのボディからCSVの内容を読み取り処理をする。
+	クラスタリングと集計結果をJSON形式で返す。
+
+todo:
+- 画面からクラスタ数を選べるようにする。コンボボックス、URLで渡す。
+	- 画面、コンボボックス追加 8h
+	- フロント、コンボボックスの値をPOSTで渡す。json。 8h
+	- バックエンド、リクエストからクラスタ数を取得、モデルに適用。 16h
+- CSVのチェック、その他のファイルをはじく、内容の確認。
+	- アップロード時に拡張子チェック、CSV以外を拒否してエラーメッセージ出す。
+	- CSVから列名抽出、ない場合は連番振る、画面にリスト出力
+	- 出力したリストにチェックボックス、選択したカラム名をPOSTで送る。
+	- 数値列か、文字列かも指定させる。コンボボックス？チェックボックスでもいいけど。
+	- 文字列カラム、数値カラムを分けてJSONで送る。
+	- API側は指定があるものはそのまま数値と文字列に分けてリスト化、
+		指定がないカラムはdataframe.types的なのでintになるかobjectになるか判定する。
+		文字列カラムと数値カラムのリストが作れればあとは今の処理に渡すだけ。
+		
+- 列を自由にできるようにする、今は定義書にあるやつだけ。
+- 文字列、数値列をdfの型から分類する（objectかどうか）
+- Dockerを使って環境構築する。 
+- APIserverのレスポンス200ok以外の時の処理。今はずっとnow loading...。
+- シェアが%表示できていない。

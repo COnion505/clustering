@@ -1,0 +1,37 @@
+export const convDispName = (key) =>{
+	const names = {
+		'cluster_no': 'クラスタ番号',
+		'count': '件数',
+		'count_share': '件数シェア',
+		'sales1_amount': '商品1合計金額',
+		'sales1_share': '商品1シェア',
+		'sales2_amount': '商品2合計金額',
+		'sales2_share': '商品2シェア',
+		'id': 'ユーザID',
+		'age': '年齢',
+		'kei_kikan': '利用期間',
+		'sex': '性別',
+		'kaku_type_code': '本人確認書類コード',
+		'phone_career': 'キャリアコード',
+		'taino_count': '滞納回数',
+		'taino_month': '直近滞納月',
+		'bill_change_count': '請求書変更回数',
+		'phone_name': '端末略名称',
+		'region_code': '地域コード',
+		'entry_age': '初回利用時年齢',
+		"plan_id": "プランID",
+		"plan_category": "プランカテゴリ",
+		"installment_count": "分割方式",
+		"campaign_code": "キャンペーンコード",
+		"campaign_code_2": "キャンペーンコード2",
+		"campaign_code_3": "キャンペーンコード3",
+		"campaign_code_4": "キャンペーンコード4",
+		"channel": "チャネル",
+		"selling_method_code": "購入方式",
+		"pay_way_code": "支払方法",
+		"sales_1": "商品1の購入金額",
+		"sales_2": "商品2の購入金額",
+	};
+
+	return key in names ? names[key] : key;
+}
