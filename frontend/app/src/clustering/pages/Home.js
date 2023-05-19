@@ -33,7 +33,7 @@ export default class Home extends React.Component{
 			const formData = new FormData();
 			formData.append("File",this.state.file);
 			formData.append("n_clusters",this.state.n_clusters);
-			fetch(`http://localhost:8000/clustering/exec/`,{
+			fetch(`http://localhost:8080/clustering/exec/`,{
 				method: "POST",
 				body: formData,
 			})

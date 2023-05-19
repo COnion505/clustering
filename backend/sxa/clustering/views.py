@@ -58,7 +58,6 @@ class Clustering(APIView):
 				conv_count += 1
 			conv_dic[col] = conv_values
 		df = df.replace(conv_dic)
-		print(model)
 		# クエリパラメータからクラスタ数を取得、セットされていない場合はデフォルトで6
 		print('n_clusters: ',request.POST.get('n_clusters',6))
 		model = KMeans(
